@@ -1,0 +1,231 @@
+html {
+	scroll-behavior: smooth;
+}
+
+body.locations-page {
+	margin: 0;
+	background: #fff;
+	font-family: Arial, Helvetica, sans-serif;
+	color: #111;
+}
+
+.locations-nav {
+	background: #fff;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.locations-nav .navbar-brand {
+	color: #f6c200 !important;
+	font-weight: 600;
+}
+
+.locations-nav .nav-link {
+	color: #111 !important;
+	font-weight: 600;
+	font-size: 1.05rem;
+	line-height: 1.2;
+}
+
+/* Ensure brand stays yellow on hover and when site-nav is used */
+.locations-nav .navbar-brand:hover,
+.site-nav .navbar-brand,
+.site-nav .navbar-brand:hover {
+	color: #f6c200 !important;
+}
+
+.locations-nav .nav-link.active,
+.locations-nav .nav-link:hover {
+	color: #f6c200 !important;
+}
+
+.locations-shell {
+	display: flex;
+	justify-content: flex-start;
+}
+
+.locations-screen {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.locations-row {
+	width: 100%;
+	padding: 0.25rem 0;
+	overflow-x: auto;
+	padding-left: 0;
+	padding-right: 0;
+	justify-content: center;
+}
+
+.locations-inline {
+	display: flex;
+	gap: 0.35rem;
+	align-items: center;
+	padding-left: 0;
+	margin-bottom: 0;
+	overflow-x: auto;
+	white-space: nowrap;
+	flex-wrap: nowrap;
+	max-width: 100%;
+	justify-content: center;
+	margin-left: auto;
+	margin-right: auto;
+}
+.locations-inline .nav-link {
+	color: #111;
+	padding: 0.55rem 0.8rem;
+	font-weight: 600;
+	font-size: 1.05rem;
+	line-height: 1.2;
+	border-radius: 2px;
+	display: inline-block;
+}
+.locations-inline .nav-link:hover,
+.locations-inline .nav-link:focus {
+	color: #111 !important;
+	background: #f6c200;
+}
+
+/* active state for inline locations (full-width highlight) */
+.locations-inline .nav-link.is-active {
+	background: #f6c200;
+	color: #111 !important;
+}
+
+.contact-corner {
+	align-self: center;
+	margin-left: auto;
+	margin-top: 0;
+	min-width: 160px;
+	text-align: center;
+}
+
+.contact-button {
+	display: inline-block;
+	min-width: 160px;
+	font-weight: 700;
+	border: 0;
+	border-radius: 0;
+	padding: 0.65rem 1rem;
+	color: #111 !important;
+}
+
+.location-hero {
+	padding: 0.75rem 0 0.25rem;
+	min-height: 110px;
+	position: relative;
+	overflow: hidden;
+	background: linear-gradient(120deg, #ffd94d, #ffe891, #ffd24d);
+	background-size: 200% 200%;
+	animation: yellowShift 8s ease-in-out infinite;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	margin-left: 0;
+	margin-right: 0;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+}
+
+.location-hero::before,
+.location-hero::after {
+	content: '';
+	position: absolute;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.18);
+	filter: blur(10px);
+	animation: floatBlob 10s ease-in-out infinite;
+	z-index: 0;
+}
+
+.location-hero::before {
+	width: 180px;
+	height: 180px;
+	top: -55px;
+	right: 10%;
+}
+
+.location-hero::after {
+	width: 240px;
+	height: 240px;
+	bottom: -110px;
+	left: -70px;
+}
+
+.location-hero-kicker {
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	color: #111;
+	position: relative;
+	z-index: 1;
+	text-align: center;
+}
+
+.location-hero-title {
+	font-family: Georgia, 'Times New Roman', serif;
+	font-size: clamp(1.9rem, 4vw, 3.4rem);
+	font-weight: 500;
+	color: #111;
+	line-height: 1.05;
+	transform-origin: left center;
+	position: relative;
+	z-index: 1;
+	text-align: center;
+}
+
+.location-hero-title.animate-in {
+	animation: titlePop 0.45s ease-out;
+}
+
+@keyframes titlePop {
+	0% {
+		opacity: 0;
+		transform: translateY(10px) scale(0.98);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes yellowShift {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+
+@keyframes floatBlob {
+	0%,
+	100% { transform: translateY(0); }
+	50% { transform: translateY(-12px); }
+}
+
+@media (max-width: 575.98px) {
+	.locations-row {
+		gap: 0.75rem;
+	}
+
+	.locations-inline {
+		padding-left: 0.5rem;
+		padding-right: 0.5rem;
+	}
+
+	.location-hero {
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+	}
+
+	.contact-corner {
+		min-width: 132px;
+		padding-left: 0.75rem;
+		padding-right: 0.75rem;
+	}
+
+	.location-hero {
+		min-height: 90px;
+	}
+}
