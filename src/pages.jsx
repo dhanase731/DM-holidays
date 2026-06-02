@@ -731,7 +731,12 @@ export function ContactPage() {
   const [contactErrors, setContactErrors] = useState({});
   const [contactSubmitted, setContactSubmitted] = useState(false);
 
-  const updateContact = (field) => (e) => setContactForm((prev) => ({ ...prev, [field]: e.target.value }));
+  const updateContact = (field) => (e) => {
+    const updated = { ...contactForm, [field]: e.target.value };
+    setContactForm(updated);
+    localStorage.setItem('dmh_contact_draft', JSON.stringify({ ...updated, city: cityKey }));
+    sessionStorage.setItem('dmh_contact_draft', JSON.stringify({ ...updated, city: cityKey }));
+  };
 
   const submitContact = (e) => {
     e.preventDefault();
@@ -746,6 +751,8 @@ export function ContactPage() {
     const existing = JSON.parse(localStorage.getItem('dmh_contact_messages') || '[]');
     localStorage.setItem('dmh_contact_messages', JSON.stringify([...existing, entry]));
     sessionStorage.setItem('dmh_last_contact', JSON.stringify(entry));
+    localStorage.removeItem('dmh_contact_draft');
+    sessionStorage.removeItem('dmh_contact_draft');
     setContactSubmitted(true);
     setContactForm(emptyContact);
   };
@@ -1148,7 +1155,12 @@ export function EnquiryPage() {
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
-  const update = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+  const update = (field) => (e) => {
+    const updated = { ...form, [field]: e.target.value };
+    setForm(updated);
+    localStorage.setItem('dmh_enquiry_draft', JSON.stringify(updated));
+    sessionStorage.setItem('dmh_enquiry_draft', JSON.stringify(updated));
+  };
 
   const submit = (e) => {
     e.preventDefault();
@@ -1162,9 +1174,10 @@ export function EnquiryPage() {
 
     const enquiry = { ...form, submittedAt: new Date().toISOString() };
     const existing = JSON.parse(localStorage.getItem('dmh_enquiries') || '[]');
-    const updated = [...existing, enquiry];
-    localStorage.setItem('dmh_enquiries', JSON.stringify(updated));
+    localStorage.setItem('dmh_enquiries', JSON.stringify([...existing, enquiry]));
     sessionStorage.setItem('dmh_last_enquiry', JSON.stringify(enquiry));
+    localStorage.removeItem('dmh_enquiry_draft');
+    sessionStorage.removeItem('dmh_enquiry_draft');
     setSubmitted(true);
     setForm({ name: '', email: '', phone: '', destination: '', date: '', people: '', message: '' });
   };
