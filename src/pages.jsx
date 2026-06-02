@@ -22,30 +22,14 @@ const phoneRegex = /^[0-9+\s-]{7,}$/;
 function BookingForm({ compact = false }) {
   const [captchaParts] = useState(() => [Math.floor(Math.random() * 9) + 1, Math.floor(Math.random() * 9) + 1]);
   const [message, setMessage] = useState('');
+  const [form, setForm] = useState({ name: '', city: '', email: '', phone: '', whatsapp: '', destination: '', date: '', people: '', vacationType: '' });
 
-  const fields = compact
-    ? [
-        ['Name *', 'text'],
-        ['City of Residence *', 'text'],
-        ['Email *', 'email'],
-        ['Phone Number *', 'tel'],
-        ['WhatsApp', 'tel'],
-        ['Travel Destination *', 'text'],
-        ['Date of Travel *', 'text'],
-        ['No. of People *', 'number'],
-        ['Vacation Type *', 'text'],
-      ]
-    : [
-        ['Name *', 'text'],
-        ['City of Residence *', 'text'],
-        ['Email *', 'email'],
-        ['Phone Number *', 'tel'],
-        ['WhatsApp', 'tel'],
-        ['Travel Destination *', 'text'],
-        ['Date of Travel *', 'text'],
-        ['No. of People *', 'number'],
-        ['Vacation Type *', 'text'],
-      ];
+  const update = (field) => (e) => {
+    const updated = { ...form, [field]: e.target.value };
+    setForm(updated);
+    localStorage.setItem('dmh_booking_draft', JSON.stringify(updated));
+    sessionStorage.setItem('dmh_booking_draft', JSON.stringify(updated));
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -55,41 +39,53 @@ function BookingForm({ compact = false }) {
       return;
     }
 
+    const entry = { ...form, submittedAt: new Date().toISOString() };
+    const existing = JSON.parse(localStorage.getItem('dmh_bookings') || '[]');
+    localStorage.setItem('dmh_bookings', JSON.stringify([...existing, entry]));
+    sessionStorage.setItem('dmh_last_booking', JSON.stringify(entry));
+    localStorage.removeItem('dmh_booking_draft');
+    sessionStorage.removeItem('dmh_booking_draft');
+
     setMessage('Thanks! Your enquiry has been submitted successfully.');
+    setForm({ name: '', city: '', email: '', phone: '', whatsapp: '', destination: '', date: '', people: '', vacationType: '' });
     event.currentTarget.reset();
   };
 
   return (
     <form className="row g-3" onSubmit={handleSubmit}>
-      {fields.map(([placeholder, type], index) => {
-        if (index === 3 && !compact) {
-          return (
-            <div className="col-12" key={placeholder}>
-              <div className="input-group input-group-lg">
-                <span className="input-group-text">🇮🇳</span>
-                <input className="form-control" type={type} placeholder={placeholder} />
-              </div>
-            </div>
-          );
-        }
-
-        if (index === 4 && !compact) {
-          return (
-            <div className="col-12" key={placeholder}>
-              <div className="input-group input-group-lg">
-                <span className="input-group-text">🇮🇳</span>
-                <input className="form-control" type={type} placeholder={placeholder} />
-              </div>
-            </div>
-          );
-        }
-
-        return (
-          <div className="col-12" key={placeholder}>
-            <input className="form-control form-control-lg" type={type} placeholder={placeholder} />
-          </div>
-        );
-      })}
+      <div className="col-12">
+        <input className="form-control form-control-lg" type="text" placeholder="Name *" value={form.name} onChange={update('name')} />
+      </div>
+      <div className="col-12">
+        <input className="form-control form-control-lg" type="text" placeholder="City of Residence *" value={form.city} onChange={update('city')} />
+      </div>
+      <div className="col-12">
+        <input className="form-control form-control-lg" type="email" placeholder="Email *" value={form.email} onChange={update('email')} />
+      </div>
+      <div className="col-12">
+        <div className="input-group input-group-lg">
+          <span className="input-group-text">🇮🇳</span>
+          <input className="form-control" type="tel" placeholder="Phone Number *" value={form.phone} onChange={update('phone')} />
+        </div>
+      </div>
+      <div className="col-12">
+        <div className="input-group input-group-lg">
+          <span className="input-group-text">🇮🇳</span>
+          <input className="form-control" type="tel" placeholder="WhatsApp" value={form.whatsapp} onChange={update('whatsapp')} />
+        </div>
+      </div>
+      <div className="col-12">
+        <input className="form-control form-control-lg" type="text" placeholder="Travel Destination *" value={form.destination} onChange={update('destination')} />
+      </div>
+      <div className="col-12">
+        <input className="form-control form-control-lg" type="text" placeholder="Date of Travel *" value={form.date} onChange={update('date')} />
+      </div>
+      <div className="col-12">
+        <input className="form-control form-control-lg" type="number" placeholder="No. of People *" value={form.people} onChange={update('people')} />
+      </div>
+      <div className="col-12">
+        <input className="form-control form-control-lg" type="text" placeholder="Vacation Type *" value={form.vacationType} onChange={update('vacationType')} />
+      </div>
       <div className="col-12">
         <label className="form-label fw-semibold mb-1">Captcha *</label>
         <div className="captcha-line mb-2">{captchaParts[0]} + {captchaParts[1]} =</div>
