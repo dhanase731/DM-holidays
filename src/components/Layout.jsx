@@ -112,6 +112,11 @@ export function SiteNavbar({ variant = 'default' }) {
             <DropdownMenu label="Company" items={companyLinks} active={companyActive} />
             <DropdownMenu label="India" items={indiaLinks} active={indiaActive} />
             <DropdownMenu label="Contact" items={contactLinks} active={contactActive} />
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/enquiry">
+                Enquiry
+              </NavLink>
+            </li>
             <li className="nav-item ms-lg-2">
               <NavLink className="btn nav-cta" to="/login">
                 Login

@@ -115,6 +115,11 @@ export function SiteNavbar({ variant = 'default' }) {
                 { to: '/contact', label: 'Our Locations' },
               ]}
             />
+            <li className="nav-item">
+              <NavLink className="nav-link" to="/enquiry">
+                Enquiry
+              </NavLink>
+            </li>
             <li className="nav-item ms-lg-2">
               <NavLink className="btn nav-cta" to="/login">
                 Login

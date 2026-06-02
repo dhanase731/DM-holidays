@@ -6,6 +6,7 @@ import {
   BookingPage,
   ContactPage,
   DestinationPage,
+  EnquiryPage,
   FaqsPage,
   HomePage,
   LoginPage,
@@ -32,6 +33,7 @@ export default function App() {
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/north-india" element={<NorthIndiaPage />} />
       <Route path="/south-india" element={<SouthIndiaPage />} />
+      <Route path="/enquiry" element={<EnquiryPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 

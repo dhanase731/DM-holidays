@@ -726,6 +726,29 @@ export function ContactPage() {
   const location = useLocation();
   const [cityKey, setCityKey] = useState('Mumbai');
   const keys = Object.keys(contactCities);
+  const emptyContact = { name: '', phone: '', email: '', area: '', date: '', tripType: '', travelers: '', message: '' };
+  const [contactForm, setContactForm] = useState(emptyContact);
+  const [contactErrors, setContactErrors] = useState({});
+  const [contactSubmitted, setContactSubmitted] = useState(false);
+
+  const updateContact = (field) => (e) => setContactForm((prev) => ({ ...prev, [field]: e.target.value }));
+
+  const submitContact = (e) => {
+    e.preventDefault();
+    const errs = {};
+    if (!contactForm.name.trim()) errs.name = 'Please enter your name.';
+    if (!phoneRegex.test(contactForm.phone)) errs.phone = 'Enter a valid phone number.';
+    if (!emailRegex.test(contactForm.email)) errs.email = 'Enter a valid email address.';
+    setContactErrors(errs);
+    if (Object.keys(errs).length) return;
+
+    const entry = { ...contactForm, city: cityKey, submittedAt: new Date().toISOString() };
+    const existing = JSON.parse(localStorage.getItem('dmh_contact_messages') || '[]');
+    localStorage.setItem('dmh_contact_messages', JSON.stringify([...existing, entry]));
+    sessionStorage.setItem('dmh_last_contact', JSON.stringify(entry));
+    setContactSubmitted(true);
+    setContactForm(emptyContact);
+  };
 
   useEffect(() => {
     const sync = () => {
@@ -832,25 +855,31 @@ export function ContactPage() {
             <div className="mumbai-form-card">
               <h2 className="mumbai-section-title mb-3">{cityKey} enquiry form</h2>
               <p className="mumbai-copy mb-4">Share your travel details below, and our team will get back with a plan made for your trip.</p>
-              <form className="row g-3">
+              {contactSubmitted && (
+                <div className="alert alert-success fw-semibold mb-3">✔ Message sent! We'll get back to you soon.</div>
+              )}
+              <form className="row g-3" onSubmit={submitContact} noValidate>
                 <div className="col-12">
-                  <input className="form-control form-control-lg" type="text" placeholder="Full name *" />
+                  <input className="form-control form-control-lg" type="text" placeholder="Full name *" value={contactForm.name} onChange={updateContact('name')} />
+                  {contactErrors.name && <small className="auth-error">{contactErrors.name}</small>}
                 </div>
                 <div className="col-12 col-md-6">
-                  <input className="form-control form-control-lg" type="tel" placeholder="Mobile number *" />
+                  <input className="form-control form-control-lg" type="tel" placeholder="Mobile number *" value={contactForm.phone} onChange={updateContact('phone')} />
+                  {contactErrors.phone && <small className="auth-error">{contactErrors.phone}</small>}
                 </div>
                 <div className="col-12 col-md-6">
-                  <input className="form-control form-control-lg" type="email" placeholder="Email address *" />
+                  <input className="form-control form-control-lg" type="email" placeholder="Email address *" value={contactForm.email} onChange={updateContact('email')} />
+                  {contactErrors.email && <small className="auth-error">{contactErrors.email}</small>}
                 </div>
                 <div className="col-12 col-md-6">
-                  <input className="form-control form-control-lg" type="text" placeholder={`${cityKey} area / locality`} />
+                  <input className="form-control form-control-lg" type="text" placeholder={`${cityKey} area / locality`} value={contactForm.area} onChange={updateContact('area')} />
                 </div>
                 <div className="col-12 col-md-6">
-                  <input className="form-control form-control-lg" type="text" placeholder="Travel date" />
+                  <input className="form-control form-control-lg" type="date" placeholder="Travel date" value={contactForm.date} onChange={updateContact('date')} />
                 </div>
                 <div className="col-12 col-md-6">
-                  <select className="form-select form-select-lg">
-                    <option>Trip type</option>
+                  <select className="form-select form-select-lg" value={contactForm.tripType} onChange={updateContact('tripType')}>
+                    <option value="">Trip type</option>
                     <option>Family Holiday</option>
                     <option>Couple Trip</option>
                     <option>Business Travel</option>
@@ -858,10 +887,10 @@ export function ContactPage() {
                   </select>
                 </div>
                 <div className="col-12 col-md-6">
-                  <input className="form-control form-control-lg" type="number" placeholder="Number of travelers" />
+                  <input className="form-control form-control-lg" type="number" placeholder="Number of travelers" min="1" value={contactForm.travelers} onChange={updateContact('travelers')} />
                 </div>
                 <div className="col-12">
-                  <textarea className="form-control form-control-lg" rows="4" placeholder={`Tell us what you are looking for in ${cityKey}`} />
+                  <textarea className="form-control form-control-lg" rows="4" placeholder={`Tell us what you are looking for in ${cityKey}`} value={contactForm.message} onChange={updateContact('message')} />
                 </div>
                 <div className="col-12">
                   <button type="submit" className="btn btn-warning btn-lg w-100 fw-semibold text-uppercase">
@@ -1109,6 +1138,91 @@ export function PackagePage() {
         </div>
         <div className="mt-5"><SiteFooter fullBleed /></div>
       </main>
+    </>
+  );
+}
+
+export function EnquiryPage() {
+  useBodyClass('auth-page');
+  const [form, setForm] = useState({ name: '', email: '', phone: '', destination: '', date: '', people: '', message: '' });
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const update = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+
+  const submit = (e) => {
+    e.preventDefault();
+    const nextErrors = {};
+    if (!form.name.trim()) nextErrors.name = 'Please enter your name.';
+    if (!emailRegex.test(form.email)) nextErrors.email = 'Enter a valid email address.';
+    if (!phoneRegex.test(form.phone)) nextErrors.phone = 'Enter a valid phone number.';
+    if (!form.destination.trim()) nextErrors.destination = 'Please enter a destination.';
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+
+    const enquiry = { ...form, submittedAt: new Date().toISOString() };
+    const existing = JSON.parse(localStorage.getItem('dmh_enquiries') || '[]');
+    const updated = [...existing, enquiry];
+    localStorage.setItem('dmh_enquiries', JSON.stringify(updated));
+    sessionStorage.setItem('dmh_last_enquiry', JSON.stringify(enquiry));
+    setSubmitted(true);
+    setForm({ name: '', email: '', phone: '', destination: '', date: '', people: '', message: '' });
+  };
+
+  return (
+    <>
+      <SiteNavbar />
+      <main className="booking-section py-5">
+        <div className="container">
+          <div className="row justify-content-center">
+            <div className="col-12 col-xl-8">
+              <div className="booking-card p-4 p-lg-5">
+                <p className="text-uppercase fw-semibold text-muted mb-2">Get in touch</p>
+                <h1 className="booking-page-title mb-3">Send an Enquiry</h1>
+                <p className="text-muted mb-4">Fill in the details below and our team will get back to you with a tailored travel plan.</p>
+                {submitted && (
+                  <div className="alert alert-success fw-semibold">
+                    ✔ Enquiry submitted! We'll contact you soon.
+                  </div>
+                )}
+                <form className="row g-3" onSubmit={submit} noValidate>
+                  <div className="col-12 col-md-6">
+                    <input className="form-control form-control-lg" type="text" placeholder="Full Name *" value={form.name} onChange={update('name')} />
+                    {errors.name && <small className="auth-error">{errors.name}</small>}
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <input className="form-control form-control-lg" type="email" placeholder="Email Address *" value={form.email} onChange={update('email')} />
+                    {errors.email && <small className="auth-error">{errors.email}</small>}
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <input className="form-control form-control-lg" type="tel" placeholder="Phone Number *" value={form.phone} onChange={update('phone')} />
+                    {errors.phone && <small className="auth-error">{errors.phone}</small>}
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <input className="form-control form-control-lg" type="text" placeholder="Travel Destination *" value={form.destination} onChange={update('destination')} />
+                    {errors.destination && <small className="auth-error">{errors.destination}</small>}
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <input className="form-control form-control-lg" type="date" placeholder="Date of Travel" value={form.date} onChange={update('date')} />
+                  </div>
+                  <div className="col-12 col-md-6">
+                    <input className="form-control form-control-lg" type="number" placeholder="No. of Travelers" min="1" value={form.people} onChange={update('people')} />
+                  </div>
+                  <div className="col-12">
+                    <textarea className="form-control form-control-lg" rows="4" placeholder="Tell us more about your trip..." value={form.message} onChange={update('message')} />
+                  </div>
+                  <div className="col-12">
+                    <button type="submit" className="btn btn-warning btn-lg w-100 fw-semibold text-uppercase">
+                      Submit Enquiry
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      <SiteFooter />
     </>
   );
 }
