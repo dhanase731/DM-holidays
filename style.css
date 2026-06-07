@@ -1320,3 +1320,352 @@ body.blog-page {
 	}
 }
 
+
+/* ─── Admin Panel ─────────────────────────────────────────────── */
+.admin-login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1d2f54 0%, #0f1c35 100%);
+  padding: 2rem 1rem;
+}
+
+.admin-login-card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 2.8rem 2.5rem;
+  width: min(420px, 100%);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+  text-align: center;
+}
+
+.admin-login-logo {
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #f6c200;
+  margin-bottom: 1.5rem;
+}
+
+.admin-login-title {
+  font-family: Georgia, serif;
+  font-size: 1.9rem;
+  color: #111;
+  margin-bottom: 0.4rem;
+}
+
+.admin-login-sub {
+  color: #888;
+  font-size: 0.9rem;
+  margin-bottom: 1.8rem;
+}
+
+.admin-login-input {
+  border-radius: 10px;
+  border-color: rgba(0,0,0,0.15);
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+}
+
+.admin-login-input:focus {
+  border-color: #f6c200;
+  box-shadow: 0 0 0 0.2rem rgba(246,194,0,0.2);
+}
+
+.admin-login-btn {
+  background: #f6c200;
+  border: none;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 1rem;
+  padding: 0.85rem;
+  color: #111;
+  transition: background 0.2s;
+}
+
+.admin-login-btn:hover {
+  background: #ffcf29;
+  color: #111;
+}
+
+.admin-login-error {
+  background: #ffeaea;
+  color: #c0392b;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.admin-login-back {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: #999;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.admin-login-back:hover { color: #333; }
+
+.admin-shell {
+  min-height: 100vh;
+  background: #f4f5f7;
+  color: #1f1f1f;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.admin-header {
+  background: #1d2f54;
+  color: #fff;
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+
+.admin-header-brand {
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: #f6c200;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.admin-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #f6c200;
+  display: inline-block;
+}
+
+.admin-header-link {
+  color: rgba(255,255,255,0.75);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.admin-header-link:hover { color: #f6c200; }
+
+.admin-logout-btn {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.35rem 0.9rem;
+}
+
+.admin-logout-btn:hover {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+}
+
+.admin-main {
+  padding: 2.5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.admin-page-title {
+  font-family: Georgia, serif;
+  font-size: 1.9rem;
+  color: #111;
+  margin-bottom: 0.2rem;
+}
+
+.admin-page-sub {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.admin-stat-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.4rem 1.2rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+}
+
+.admin-stat-value {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.admin-stat-label {
+  font-size: 0.82rem;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.admin-table-section {
+  background: #fff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+}
+
+.admin-table-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #111;
+}
+
+.admin-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f0f0;
+  color: #555;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  margin-left: 0.5rem;
+}
+
+.admin-search {
+  width: 220px;
+  border-radius: 8px;
+  border-color: rgba(0,0,0,0.12);
+}
+
+.admin-search:focus {
+  border-color: #f6c200;
+  box-shadow: 0 0 0 0.15rem rgba(246,194,0,0.2);
+}
+
+.admin-table {
+  font-size: 0.875rem;
+  margin-bottom: 0;
+}
+
+.admin-table thead th {
+  background: #f8f8f8;
+  color: #444;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #eee;
+  white-space: nowrap;
+}
+
+.admin-table tbody tr:hover td {
+  background: #fffdf4;
+}
+
+.admin-table td,
+.admin-table th {
+  vertical-align: middle;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-empty {
+  text-align: center;
+  color: #aaa;
+  padding: 2.5rem;
+  font-size: 0.9rem;
+}
+
+.admin-refresh-btn {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #444;
+}
+
+.admin-refresh-btn:hover {
+  background: #f6c200;
+  border-color: #f6c200;
+  color: #111;
+}
+
+.admin-danger-zone {
+  background: #fff5f5;
+  border: 1px solid #ffd5d5;
+  border-radius: 14px;
+  padding: 1.2rem 1.5rem;
+}
+
+.admin-danger-title {
+  color: #c0392b;
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+}
+
+.admin-clear-btn {
+  background: #fff;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.admin-clear-btn:hover {
+  background: #e74c3c;
+  color: #fff;
+}
+
+@media (max-width: 767.98px) {
+  .admin-main { padding: 1.5rem 1rem; }
+  .admin-header { padding: 0 1rem; }
+  .admin-search { width: 100%; }
+  .admin-stat-value { font-size: 1.5rem; }
+}
+
+.admin-status-select {
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  background: #fff;
+  cursor: pointer;
+}
+
+.admin-delete-btn {
+  background: none;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.admin-delete-btn:hover {
+  background: #e74c3c;
+  color: #fff;
+}
+
+.admin-offline-badge {
+  background: #fff3cd;
+  color: #856404;
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+}

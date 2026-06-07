@@ -15,6 +15,7 @@ import {
   SouthIndiaPage,
   SignupPage,
 } from './pages';
+import { AdminPage } from './AdminPage';
 import { destinationDetails, packageDetails } from './siteData';
 
 const destinationRoutes = Object.keys(destinationDetails);
@@ -34,6 +35,7 @@ export default function App() {
       <Route path="/north-india" element={<NorthIndiaPage />} />
       <Route path="/south-india" element={<SouthIndiaPage />} />
       <Route path="/enquiry" element={<EnquiryPage />} />
+      <Route path="/admin" element={<AdminPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 

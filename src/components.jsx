@@ -173,6 +173,9 @@ export function SiteFooter({ fullBleed = false }) {
                 <span>▶</span>
                 <span>G</span>
               </div>
+              <div className="mt-3">
+                <Link to="/admin" style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.35)', textDecoration: 'none' }}>Admin</Link>
+              </div>
             </div>
           </div>
         </div>

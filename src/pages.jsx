@@ -14,6 +14,7 @@ import {
 } from './siteData';
 import { assets } from './assets';
 import { HeroCarousel, PackageGallery, SiteFooter, SiteNavbar, useBodyClass } from './components';
+import { submitEnquiry, submitContact as apiSubmitContact, submitBooking } from './api';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
@@ -31,7 +32,7 @@ function BookingForm({ compact = false }) {
     sessionStorage.setItem('dmh_booking_draft', JSON.stringify(updated));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const answer = Number(event.currentTarget.elements.captcha?.value);
     if (answer !== captchaParts[0] + captchaParts[1]) {
@@ -39,13 +40,9 @@ function BookingForm({ compact = false }) {
       return;
     }
 
-    const entry = { ...form, submittedAt: new Date().toISOString() };
-    const existing = JSON.parse(localStorage.getItem('dmh_bookings') || '[]');
-    localStorage.setItem('dmh_bookings', JSON.stringify([...existing, entry]));
-    sessionStorage.setItem('dmh_last_booking', JSON.stringify(entry));
+    await submitBooking(form);
     localStorage.removeItem('dmh_booking_draft');
     sessionStorage.removeItem('dmh_booking_draft');
-
     setMessage('Thanks! Your enquiry has been submitted successfully.');
     setForm({ name: '', city: '', email: '', phone: '', whatsapp: '', destination: '', date: '', people: '', vacationType: '' });
     event.currentTarget.reset();
@@ -734,7 +731,7 @@ export function ContactPage() {
     sessionStorage.setItem('dmh_contact_draft', JSON.stringify({ ...updated, city: cityKey }));
   };
 
-  const submitContact = (e) => {
+  const submitContact = async (e) => {
     e.preventDefault();
     const errs = {};
     if (!contactForm.name.trim()) errs.name = 'Please enter your name.';
@@ -749,6 +746,7 @@ export function ContactPage() {
     sessionStorage.setItem('dmh_last_contact', JSON.stringify(entry));
     localStorage.removeItem('dmh_contact_draft');
     sessionStorage.removeItem('dmh_contact_draft');
+    await apiSubmitContact({ ...contactForm, city: cityKey });
     setContactSubmitted(true);
     setContactForm(emptyContact);
   };
@@ -1158,7 +1156,7 @@ export function EnquiryPage() {
     sessionStorage.setItem('dmh_enquiry_draft', JSON.stringify(updated));
   };
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
     const nextErrors = {};
     if (!form.name.trim()) nextErrors.name = 'Please enter your name.';
@@ -1174,6 +1172,7 @@ export function EnquiryPage() {
     sessionStorage.setItem('dmh_last_enquiry', JSON.stringify(enquiry));
     localStorage.removeItem('dmh_enquiry_draft');
     sessionStorage.removeItem('dmh_enquiry_draft');
+    await submitEnquiry(form);
     setSubmitted(true);
     setForm({ name: '', email: '', phone: '', destination: '', date: '', people: '', message: '' });
   };
