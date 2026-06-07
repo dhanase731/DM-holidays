@@ -138,8 +138,18 @@ export function AdminPage() {
       setPassword(pwdInput);
       setAuthed(true);
       fetchData(pwdInput);
+    } else if (result.offline) {
+      // backend not running — verify against hardcoded password and use localStorage
+      if (pwdInput === 'dmholidays2024') {
+        sessionStorage.setItem(STORED_PWD_KEY, pwdInput);
+        setPassword(pwdInput);
+        setAuthed(true);
+        fetchData(pwdInput);
+      } else {
+        setError('Incorrect password.');
+      }
     } else {
-      setError(result.offline ? 'Server offline. Check if backend is running.' : 'Incorrect password.');
+      setError('Incorrect password.');
     }
   };
 
