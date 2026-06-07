@@ -66,7 +66,7 @@ function DataTable({ title, rows, columns, color, collection, password, onRefres
             <tbody>
               {filtered.map((row, i) => (
                 <tr key={row._id}>
-                  <td className="text-muted">{i + 1}</td>
+                  <td className="text-muted fw-bold">{i + 1}</td>
                   {columns.map((col) => (
                     <td key={col.key} title={row[col.key] || ''}>
                       {row[col.key] || '—'}
@@ -90,7 +90,14 @@ function DataTable({ title, rows, columns, color, collection, password, onRefres
                     </select>
                   </td>
                   <td>
-                    <button className="admin-delete-btn" onClick={() => handleDelete(row._id)} title="Delete">✕</button>
+                    <button 
+                      className="btn btn-sm btn-outline-danger admin-delete-btn" 
+                      onClick={() => handleDelete(row._id)} 
+                      title="Delete"
+                      style={{ width: '30px', height: '30px', padding: '0', lineHeight: '1' }}
+                    >
+                      ✕
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -113,19 +120,30 @@ export function AdminPage() {
 
   const fetchData = useCallback(async (pwd) => {
     setLoading(true);
-    const result = await adminGetData(pwd);
-    setLoading(false);
-    if (result.offline) {
+    try {
+      const result = await adminGetData(pwd);
+      if (result.offline) {
+        setOffline(true);
+        // fallback to localStorage
+        setData({
+          enquiries: JSON.parse(localStorage.getItem('dmh_enquiries') || '[]'),
+          contacts: JSON.parse(localStorage.getItem('dmh_contact_messages') || '[]'),
+          bookings: JSON.parse(localStorage.getItem('dmh_bookings') || '[]'),
+        });
+      } else if (result.success) {
+        setOffline(false);
+        setData({ enquiries: result.enquiries, contacts: result.contacts, bookings: result.bookings });
+      }
+    } catch (error) {
+      console.error('Failed to fetch admin data:', error);
       setOffline(true);
-      // fallback to localStorage
       setData({
         enquiries: JSON.parse(localStorage.getItem('dmh_enquiries') || '[]'),
         contacts: JSON.parse(localStorage.getItem('dmh_contact_messages') || '[]'),
         bookings: JSON.parse(localStorage.getItem('dmh_bookings') || '[]'),
       });
-    } else if (result.success) {
-      setOffline(false);
-      setData({ enquiries: result.enquiries, contacts: result.contacts, bookings: result.bookings });
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -195,7 +213,9 @@ export function AdminPage() {
   }
 
   const total = data.enquiries.length + data.contacts.length + data.bookings.length;
-  const newCount = [...data.enquiries, ...data.contacts, ...data.bookings].filter((r) => (r.status || r.submittedAt) && (r.status === 'new' || !r.status)).length;
+  const newCount = [...data.enquiries, ...data.contacts, ...data.bookings]
+    .filter((r) => !r.status || r.status === 'new')
+    .length;
 
   const enquiryCols = [
     { key: 'name', label: 'Name' },
@@ -257,13 +277,27 @@ export function AdminPage() {
           <StatCard label="Bookings" value={data.bookings.length} color="#1d9e6c" />
         </div>
 
-        <div className="d-flex justify-content-end mb-3">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            {offline && (
+              <div className="alert alert-warning py-2 mb-0" style={{ fontSize: '0.875rem' }}>
+                ⚠ Offline mode: Showing localStorage data. Start backend server for live MongoDB data.
+              </div>
+            )}
+          </div>
           <button
-            className="btn btn-sm admin-refresh-btn"
+            className="btn btn-outline-primary admin-refresh-btn"
             onClick={() => fetchData(password)}
             disabled={loading}
           >
-            {loading ? 'Loading...' : '↻ Refresh'}
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2"></span>
+                Loading...
+              </>
+            ) : (
+              <>↻ Refresh Data</>
+            )}
           </button>
         </div>
 
@@ -277,25 +311,29 @@ export function AdminPage() {
           onRefresh={() => fetchData(password)}
         />
 
-        <DataTable
-          title="Contact Submissions"
-          rows={data.contacts}
-          columns={contactCols}
-          color="#e25c4a"
-          collection="contacts"
-          password={password}
-          onRefresh={() => fetchData(password)}
-        />
+        {data.contacts.length > 0 && (
+          <DataTable
+            title="Contact Submissions"
+            rows={data.contacts}
+            columns={contactCols}
+            color="#e25c4a"
+            collection="contacts"
+            password={password}
+            onRefresh={() => fetchData(password)}
+          />
+        )}
 
-        <DataTable
-          title="Booking Submissions"
-          rows={data.bookings}
-          columns={bookingCols}
-          color="#1d9e6c"
-          collection="bookings"
-          password={password}
-          onRefresh={() => fetchData(password)}
-        />
+        {data.bookings.length > 0 && (
+          <DataTable
+            title="Booking Submissions"
+            rows={data.bookings}
+            columns={bookingCols}
+            color="#1d9e6c"
+            collection="bookings"
+            password={password}
+            onRefresh={() => fetchData(password)}
+          />
+        )}
       </main>
     </div>
   );

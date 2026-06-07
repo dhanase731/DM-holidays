@@ -1,6 +1,7 @@
-const BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const BASE = import.meta.env.VITE_API_URL || null;
 
 async function post(endpoint, data) {
+  if (!BASE) return { success: false, offline: true };
   try {
     const res = await fetch(`${BASE}/${endpoint}`, {
       method: 'POST',
@@ -43,6 +44,7 @@ export async function adminLogin(password) {
 }
 
 export async function adminGetData(password) {
+  if (!BASE) return { success: false, offline: true };
   try {
     const res = await fetch(`${BASE}/admin/data?password=${encodeURIComponent(password)}`);
     return await res.json();
@@ -52,6 +54,7 @@ export async function adminGetData(password) {
 }
 
 export async function adminUpdateStatus(collection, id, status, password) {
+  if (!BASE) return { success: false };
   try {
     const res = await fetch(`${BASE}/admin/${collection}/${id}`, {
       method: 'PATCH',
@@ -65,6 +68,7 @@ export async function adminUpdateStatus(collection, id, status, password) {
 }
 
 export async function adminDeleteRecord(collection, id, password) {
+  if (!BASE) return { success: false };
   try {
     const res = await fetch(`${BASE}/admin/${collection}/${id}?password=${encodeURIComponent(password)}`, {
       method: 'DELETE',

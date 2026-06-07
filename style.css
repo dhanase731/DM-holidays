@@ -1669,3 +1669,71 @@ body.blog-page {
   font-size: 0.78rem;
   font-weight: 700;
 }
+
+
+/* Admin improvements */
+.admin-empty-message {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+  font-style: italic;
+}
+
+.admin-table-section:empty {
+  display: none;
+}
+
+.admin-table td {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.admin-warning-alert {
+  background: #fff8e1;
+  border: 1px solid #ffecb3;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-success-alert {
+  background: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.admin-loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  border-top-color: #f6c200;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
