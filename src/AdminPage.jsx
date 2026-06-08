@@ -158,7 +158,7 @@ export function AdminPage() {
       fetchData(pwdInput);
     } else if (result.offline) {
       // backend not running — verify against hardcoded password and use localStorage
-      if (pwdInput === 'dmholidays2024') {
+      if (pwdInput === 'surya@123') {
         sessionStorage.setItem(STORED_PWD_KEY, pwdInput);
         setPassword(pwdInput);
         setAuthed(true);
