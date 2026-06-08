@@ -30,6 +30,8 @@ function shouldServeApp(urlPath) {
   if (urlPath.startsWith('/blog/')) return true;
   if (urlPath.startsWith('/destinations/')) return true;
   if (urlPath.startsWith('/packages/')) return true;
+  if (urlPath === '/admin') return true;
+  if (urlPath === '/enquiry') return true;
   if (/^\/(agra|amritsar|araku-valley|bangalore|chandigarh|chennai|coorg|delhi|gulmarg|alleppey)\.html$/i.test(urlPath)) {
     return true;
   }
