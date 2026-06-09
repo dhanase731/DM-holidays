@@ -115,6 +115,7 @@ export function AdminPage() {
   const [pwdInput, setPwdInput] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState({ enquiries: [], contacts: [], bookings: [] });
 
   const fetchData = useCallback(async (pwd) => {
     setLoading(true);
