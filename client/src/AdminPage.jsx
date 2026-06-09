@@ -115,33 +115,16 @@ export function AdminPage() {
   const [pwdInput, setPwdInput] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({ enquiries: [], contacts: [], bookings: [] });
-  const [offline, setOffline] = useState(false);
 
   const fetchData = useCallback(async (pwd) => {
     setLoading(true);
     try {
       const result = await adminGetData(pwd);
-      if (result.offline) {
-        setOffline(true);
-        // fallback to localStorage
-        setData({
-          enquiries: JSON.parse(localStorage.getItem('dmh_enquiries') || '[]'),
-          contacts: JSON.parse(localStorage.getItem('dmh_contact_messages') || '[]'),
-          bookings: JSON.parse(localStorage.getItem('dmh_bookings') || '[]'),
-        });
-      } else if (result.success) {
-        setOffline(false);
+      if (result.success) {
         setData({ enquiries: result.enquiries, contacts: result.contacts, bookings: result.bookings });
       }
-    } catch (error) {
-      console.error('Failed to fetch admin data:', error);
-      setOffline(true);
-      setData({
-        enquiries: JSON.parse(localStorage.getItem('dmh_enquiries') || '[]'),
-        contacts: JSON.parse(localStorage.getItem('dmh_contact_messages') || '[]'),
-        bookings: JSON.parse(localStorage.getItem('dmh_bookings') || '[]'),
-      });
+    } catch (err) {
+      console.error('Failed to fetch admin data:', err);
     } finally {
       setLoading(false);
     }
@@ -150,15 +133,9 @@ export function AdminPage() {
   const login = async (e) => {
     e.preventDefault();
     setError('');
-    const result = await adminLogin(pwdInput);
-    if (result.success) {
-      sessionStorage.setItem(STORED_PWD_KEY, pwdInput);
-      setPassword(pwdInput);
-      setAuthed(true);
-      fetchData(pwdInput);
-    } else if (result.offline) {
-      // backend not running — verify against hardcoded password and use localStorage
-      if (pwdInput === 'surya@123') {
+    try {
+      const result = await adminLogin(pwdInput);
+      if (result.success) {
         sessionStorage.setItem(STORED_PWD_KEY, pwdInput);
         setPassword(pwdInput);
         setAuthed(true);
@@ -166,8 +143,8 @@ export function AdminPage() {
       } else {
         setError('Incorrect password.');
       }
-    } else {
-      setError('Incorrect password.');
+    } catch {
+      setError('Could not connect to server. Please try again.');
     }
   };
 
@@ -256,7 +233,6 @@ export function AdminPage() {
           DM Holidays — Admin
         </div>
         <div className="d-flex align-items-center gap-3">
-          {offline && <span className="admin-offline-badge">⚠ Offline Mode</span>}
           <Link to="/" className="admin-header-link">View Site</Link>
           <button className="btn admin-logout-btn" onClick={logout}>Logout</button>
         </div>
@@ -265,9 +241,7 @@ export function AdminPage() {
       <main className="admin-main container-fluid">
         <div className="admin-page-title-row mb-4">
           <h1 className="admin-page-title">Dashboard</h1>
-          <p className="admin-page-sub">
-            {offline ? 'Showing localStorage data — start the backend server for live MongoDB data.' : 'Live data from MongoDB'}
-          </p>
+          <p className="admin-page-sub">Live data from MongoDB</p>
         </div>
 
         <div className="row g-3 mb-5">
@@ -278,13 +252,7 @@ export function AdminPage() {
         </div>
 
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <div>
-            {offline && (
-              <div className="alert alert-warning py-2 mb-0" style={{ fontSize: '0.875rem' }}>
-                ⚠ Offline mode: Showing localStorage data. Start backend server for live MongoDB data.
-              </div>
-            )}
-          </div>
+          <div />
           <button
             className="btn btn-outline-primary admin-refresh-btn"
             onClick={() => fetchData(password)}

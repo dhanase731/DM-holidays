@@ -25,12 +25,7 @@ function BookingForm({ compact = false }) {
   const [message, setMessage] = useState('');
   const [form, setForm] = useState({ name: '', city: '', email: '', phone: '', whatsapp: '', destination: '', date: '', people: '', vacationType: '' });
 
-  const update = (field) => (e) => {
-    const updated = { ...form, [field]: e.target.value };
-    setForm(updated);
-    localStorage.setItem('dmh_booking_draft', JSON.stringify(updated));
-    sessionStorage.setItem('dmh_booking_draft', JSON.stringify(updated));
-  };
+  const update = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -39,13 +34,14 @@ function BookingForm({ compact = false }) {
       setMessage('Captcha incorrect. Please try again.');
       return;
     }
-
-    await submitBooking(form);
-    localStorage.removeItem('dmh_booking_draft');
-    sessionStorage.removeItem('dmh_booking_draft');
-    setMessage('Thanks! Your enquiry has been submitted successfully.');
-    setForm({ name: '', city: '', email: '', phone: '', whatsapp: '', destination: '', date: '', people: '', vacationType: '' });
-    event.currentTarget.reset();
+    try {
+      await submitBooking(form);
+      setMessage('Thanks! Your enquiry has been submitted successfully.');
+      setForm({ name: '', city: '', email: '', phone: '', whatsapp: '', destination: '', date: '', people: '', vacationType: '' });
+      event.currentTarget.reset();
+    } catch {
+      setMessage('Submission failed. Please try again.');
+    }
   };
 
   return (
@@ -724,12 +720,7 @@ export function ContactPage() {
   const [contactErrors, setContactErrors] = useState({});
   const [contactSubmitted, setContactSubmitted] = useState(false);
 
-  const updateContact = (field) => (e) => {
-    const updated = { ...contactForm, [field]: e.target.value };
-    setContactForm(updated);
-    localStorage.setItem('dmh_contact_draft', JSON.stringify({ ...updated, city: cityKey }));
-    sessionStorage.setItem('dmh_contact_draft', JSON.stringify({ ...updated, city: cityKey }));
-  };
+  const updateContact = (field) => (e) => setContactForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   const submitContact = async (e) => {
     e.preventDefault();
@@ -739,16 +730,13 @@ export function ContactPage() {
     if (!emailRegex.test(contactForm.email)) errs.email = 'Enter a valid email address.';
     setContactErrors(errs);
     if (Object.keys(errs).length) return;
-
-    const entry = { ...contactForm, city: cityKey, submittedAt: new Date().toISOString() };
-    const existing = JSON.parse(localStorage.getItem('dmh_contact_messages') || '[]');
-    localStorage.setItem('dmh_contact_messages', JSON.stringify([...existing, entry]));
-    sessionStorage.setItem('dmh_last_contact', JSON.stringify(entry));
-    localStorage.removeItem('dmh_contact_draft');
-    sessionStorage.removeItem('dmh_contact_draft');
-    await apiSubmitContact({ ...contactForm, city: cityKey });
-    setContactSubmitted(true);
-    setContactForm(emptyContact);
+    try {
+      await apiSubmitContact({ ...contactForm, city: cityKey });
+      setContactSubmitted(true);
+      setContactForm(emptyContact);
+    } catch {
+      setContactErrors({ name: 'Submission failed. Please try again.' });
+    }
   };
 
   useEffect(() => {
@@ -1149,12 +1137,7 @@ export function EnquiryPage() {
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
-  const update = (field) => (e) => {
-    const updated = { ...form, [field]: e.target.value };
-    setForm(updated);
-    localStorage.setItem('dmh_enquiry_draft', JSON.stringify(updated));
-    sessionStorage.setItem('dmh_enquiry_draft', JSON.stringify(updated));
-  };
+  const update = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
   const submit = async (e) => {
     e.preventDefault();
@@ -1165,16 +1148,13 @@ export function EnquiryPage() {
     if (!form.destination.trim()) nextErrors.destination = 'Please enter a destination.';
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length) return;
-
-    const enquiry = { ...form, submittedAt: new Date().toISOString() };
-    const existing = JSON.parse(localStorage.getItem('dmh_enquiries') || '[]');
-    localStorage.setItem('dmh_enquiries', JSON.stringify([...existing, enquiry]));
-    sessionStorage.setItem('dmh_last_enquiry', JSON.stringify(enquiry));
-    localStorage.removeItem('dmh_enquiry_draft');
-    sessionStorage.removeItem('dmh_enquiry_draft');
-    await submitEnquiry(form);
-    setSubmitted(true);
-    setForm({ name: '', email: '', phone: '', destination: '', date: '', people: '', message: '' });
+    try {
+      await submitEnquiry(form);
+      setSubmitted(true);
+      setForm({ name: '', email: '', phone: '', destination: '', date: '', people: '', message: '' });
+    } catch {
+      setErrors({ name: 'Submission failed. Please try again.' });
+    }
   };
 
   return (

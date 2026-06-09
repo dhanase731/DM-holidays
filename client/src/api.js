@@ -1,41 +1,48 @@
-const BASE = import.meta.env.VITE_API_URL || null;
+const BASE = import.meta.env.VITE_API_URL;
+
+if (!BASE) console.error('VITE_API_URL is not set');
 
 async function post(endpoint, data) {
-  if (!BASE) return { success: false, offline: true };
-  try {
-    const res = await fetch(`${BASE}/${endpoint}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    return await res.json();
-  } catch {
-    return { success: false, offline: true };
-  }
+  const res = await fetch(`${BASE}/${endpoint}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Server error: ${res.status}`);
+  return res.json();
+}
+
+async function get(endpoint) {
+  const res = await fetch(`${BASE}/${endpoint}`);
+  if (!res.ok) throw new Error(`Server error: ${res.status}`);
+  return res.json();
+}
+
+async function patch(endpoint, data) {
+  const res = await fetch(`${BASE}/${endpoint}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Server error: ${res.status}`);
+  return res.json();
+}
+
+async function del(endpoint) {
+  const res = await fetch(`${BASE}/${endpoint}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error(`Server error: ${res.status}`);
+  return res.json();
 }
 
 export async function submitEnquiry(data) {
-  // always save to localStorage too
-  const list = JSON.parse(localStorage.getItem('dmh_enquiries') || '[]');
-  const entry = { ...data, submittedAt: new Date().toISOString() };
-  localStorage.setItem('dmh_enquiries', JSON.stringify([entry, ...list]));
-  sessionStorage.setItem('dmh_last_enquiry', JSON.stringify(entry));
   return post('enquiry', data);
 }
 
 export async function submitContact(data) {
-  const list = JSON.parse(localStorage.getItem('dmh_contact_messages') || '[]');
-  const entry = { ...data, submittedAt: new Date().toISOString() };
-  localStorage.setItem('dmh_contact_messages', JSON.stringify([entry, ...list]));
-  sessionStorage.setItem('dmh_last_contact', JSON.stringify(entry));
   return post('contact', data);
 }
 
 export async function submitBooking(data) {
-  const list = JSON.parse(localStorage.getItem('dmh_bookings') || '[]');
-  const entry = { ...data, submittedAt: new Date().toISOString() };
-  localStorage.setItem('dmh_bookings', JSON.stringify([entry, ...list]));
-  sessionStorage.setItem('dmh_last_booking', JSON.stringify(entry));
   return post('booking', data);
 }
 
@@ -44,37 +51,13 @@ export async function adminLogin(password) {
 }
 
 export async function adminGetData(password) {
-  if (!BASE) return { success: false, offline: true };
-  try {
-    const res = await fetch(`${BASE}/admin/data?password=${encodeURIComponent(password)}`);
-    return await res.json();
-  } catch {
-    return { success: false, offline: true };
-  }
+  return get(`admin/data?password=${encodeURIComponent(password)}`);
 }
 
 export async function adminUpdateStatus(collection, id, status, password) {
-  if (!BASE) return { success: false };
-  try {
-    const res = await fetch(`${BASE}/admin/${collection}/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status, password }),
-    });
-    return await res.json();
-  } catch {
-    return { success: false };
-  }
+  return patch(`admin/${collection}/${id}`, { status, password });
 }
 
 export async function adminDeleteRecord(collection, id, password) {
-  if (!BASE) return { success: false };
-  try {
-    const res = await fetch(`${BASE}/admin/${collection}/${id}?password=${encodeURIComponent(password)}`, {
-      method: 'DELETE',
-    });
-    return await res.json();
-  } catch {
-    return { success: false };
-  }
+  return del(`admin/${collection}/${id}?password=${encodeURIComponent(password)}`);
 }
