@@ -999,17 +999,35 @@ export function PackagePage() {
   const pkg = packageDetails[slug] ?? packageDetails['pkg-gulmarg-snow'];
   const [captchaParts] = useState(() => [Math.floor(Math.random() * 9) + 1, Math.floor(Math.random() * 9) + 1]);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const emptyForm = { name: '', city: '', email: '', phone: '', whatsapp: '', date: '', people: '', vacationType: '', captcha: '' };
+  const [form, setForm] = useState(emptyForm);
+  const updateField = (field) => (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const answer = Number(event.currentTarget.elements.captcha?.value);
-    if (answer !== captchaParts[0] + captchaParts[1]) {
+    setSubmitError('');
+    if (Number(form.captcha) !== captchaParts[0] + captchaParts[1]) {
       window.alert('Captcha incorrect.');
       return;
     }
-
-    setSubmitted(true);
-    event.currentTarget.reset();
+    try {
+      await submitEnquiry({
+        name: form.name,
+        city: form.city,
+        email: form.email,
+        phone: form.phone,
+        destination: pkg.title,
+        date: form.date,
+        people: form.people,
+        message: form.vacationType,
+        source: `package-${slug}`,
+      });
+      setSubmitted(true);
+      setForm(emptyForm);
+    } catch {
+      setSubmitError('Submission failed. Please try again.');
+    }
   };
 
   return (
@@ -1096,22 +1114,23 @@ export function PackagePage() {
                 <p className="mb-3"><strong>✉️</strong> mail@dmholidays.in</p>
                 <h5 className="mb-3">Enquiry Form</h5>
                 <form className="enquiry-form" onSubmit={handleSubmit}>
-                  <div className="mb-2"><input type="text" className="form-control" placeholder="Name *" required /></div>
-                  <div className="mb-2"><input type="text" className="form-control" placeholder="City of Residence *" required /></div>
-                  <div className="mb-2"><input type="email" className="form-control" placeholder="Email *" required /></div>
-                  <div className="mb-2"><div className="input-group"><span className="input-group-text" style={{ borderRadius: 0, borderColor: '#d9d9d9' }}>🇮🇳 +91</span><input type="tel" className="form-control" placeholder="Phone Number *" required /></div></div>
-                  <div className="mb-2"><div className="input-group"><span className="input-group-text" style={{ borderRadius: 0, borderColor: '#d9d9d9' }}>🇮🇳 +91</span><input type="tel" className="form-control" placeholder="WhatsApp" /></div></div>
+                  <div className="mb-2"><input type="text" className="form-control" placeholder="Name *" value={form.name} onChange={updateField('name')} required /></div>
+                  <div className="mb-2"><input type="text" className="form-control" placeholder="City of Residence *" value={form.city} onChange={updateField('city')} required /></div>
+                  <div className="mb-2"><input type="email" className="form-control" placeholder="Email *" value={form.email} onChange={updateField('email')} required /></div>
+                  <div className="mb-2"><div className="input-group"><span className="input-group-text" style={{ borderRadius: 0, borderColor: '#d9d9d9' }}>🇮🇳 +91</span><input type="tel" className="form-control" placeholder="Phone Number *" value={form.phone} onChange={updateField('phone')} required /></div></div>
+                  <div className="mb-2"><div className="input-group"><span className="input-group-text" style={{ borderRadius: 0, borderColor: '#d9d9d9' }}>🇮🇳 +91</span><input type="tel" className="form-control" placeholder="WhatsApp" value={form.whatsapp} onChange={updateField('whatsapp')} /></div></div>
                   <div className="mb-2"><input type="text" className="form-control" value={pkg.title} readOnly /></div>
-                  <div className="mb-2"><input type="date" className="form-control" required /></div>
-                  <div className="mb-2"><input type="number" className="form-control" placeholder="No. of People *" min="1" required /></div>
-                  <div className="mb-2"><input type="text" className="form-control" placeholder="Vacation Type *" /></div>
+                  <div className="mb-2"><input type="date" className="form-control" value={form.date} onChange={updateField('date')} required /></div>
+                  <div className="mb-2"><input type="number" className="form-control" placeholder="No. of People *" min="1" value={form.people} onChange={updateField('people')} required /></div>
+                  <div className="mb-2"><input type="text" className="form-control" placeholder="Vacation Type *" value={form.vacationType} onChange={updateField('vacationType')} /></div>
                   <div className="mb-3">
                     <p className="mb-1 fw-bold small">Captcha *</p>
                     <div className="captcha-box mb-2" id="captchaQ">{captchaParts[0]} + {captchaParts[1]} = ?</div>
-                    <input type="text" className="form-control" name="captcha" placeholder="Your answer" required />
+                    <input type="text" className="form-control" name="captcha" placeholder="Your answer" value={form.captcha} onChange={updateField('captcha')} required />
                   </div>
                   <button type="submit" className="btn btn-warning w-100 fw-bold">SEND ENQUIRY</button>
-                  {submitted ? <div className="mt-2 text-success fw-bold">✔ Enquiry sent! We'll contact you soon.</div> : null}
+                  {submitted && <div className="mt-2 text-success fw-bold">✔ Enquiry sent! We'll contact you soon.</div>}
+                  {submitError && <div className="mt-2 text-danger fw-bold">{submitError}</div>}
                 </form>
               </div>
             </aside>
