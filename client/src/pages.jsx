@@ -1307,8 +1307,7 @@ export function LoginPage() {
     if (form.remember) localStorage.setItem('dmh_user', JSON.stringify(user));
     else sessionStorage.setItem('dmh_user', JSON.stringify(user));
 
-    // Track visitor login
-    trackVisitor({ name: user.name, email: user.email, page: '/login' });
+    trackVisitor({ name: user.name || user.email, email: user.email, page: '/login', action: 'login' });
 
     navigate(location.state?.from?.pathname ?? '/');
   };
@@ -1397,6 +1396,7 @@ export function SignupPage() {
     const payload = JSON.stringify(user);
     localStorage.setItem('dmh_user', payload);
     sessionStorage.setItem('dmh_user', payload);
+    trackVisitor({ name: user.name, email: user.email, page: '/signup', action: 'signup' });
     setMessage('Account created! You can now log in.');
     navigate('/login');
   };

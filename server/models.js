@@ -42,6 +42,7 @@ const visitorSchema = new mongoose.Schema({
   name:      { type: String, trim: true, default: 'Guest' },
   email:     { type: String, trim: true, default: '' },
   page:      { type: String, trim: true, default: '/' },
+  action:    { type: String, trim: true, default: 'visit' },
   userAgent: { type: String, trim: true, default: '' },
   ip:        { type: String, trim: true, default: '' },
 }, { timestamps: true });

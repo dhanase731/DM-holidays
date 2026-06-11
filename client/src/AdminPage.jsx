@@ -292,8 +292,11 @@ export function AdminPage() {
     { key: 'date', label: 'Travel Date' }, { key: 'people', label: 'People' }, { key: 'vacationType', label: 'Vacation Type' },
   ];
   const visitorCols = [
-    { key: 'name', label: 'Name' }, { key: 'email', label: 'Email' },
-    { key: 'page', label: 'Page' }, { key: 'ip', label: 'IP' },
+    { key: 'action', label: 'Action' },
+    { key: 'name', label: 'Name' },
+    { key: 'email', label: 'Email' },
+    { key: 'page', label: 'Page' },
+    { key: 'ip', label: 'IP' },
   ];
 
   const tabs = [
@@ -362,12 +365,21 @@ export function AdminPage() {
                 <div className="table-responsive">
                   <table className="table admin-table">
                     <thead>
-                      <tr><th>#</th><th>Name</th><th>Email</th><th>Page</th><th>IP</th><th>Date</th></tr>
+                      <tr><th>#</th><th>Action</th><th>Name</th><th>Email</th><th>Page</th><th>IP</th><th>Date</th></tr>
                     </thead>
                     <tbody>
                       {data.visitors.slice(0, 10).map((v, i) => (
                         <tr key={v._id}>
                           <td className="text-muted fw-bold">{i + 1}</td>
+                          <td>
+                            <span style={{
+                              background: v.action === 'login' ? '#e3f2fd' : v.action === 'signup' ? '#e8f5e9' : '#f3f3f3',
+                              color: v.action === 'login' ? '#1565c0' : v.action === 'signup' ? '#2e7d32' : '#555',
+                              padding: '2px 8px', borderRadius: 999, fontSize: '0.75rem', fontWeight: 700,
+                            }}>
+                              {v.action || 'visit'}
+                            </span>
+                          </td>
                           <td>{v.name || '—'}</td>
                           <td>{v.email || '—'}</td>
                           <td>{v.page || '—'}</td>
