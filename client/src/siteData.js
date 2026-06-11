@@ -418,8 +418,156 @@ const packageBase = {
   ],
 };
 
+const packageImages = {
+  'pkg-golden-triangle': {
+    heroImage: 'https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg',
+      'https://images.pexels.com/photos/2404368/pexels-photo-2404368.jpeg',
+      'https://images.pexels.com/photos/34334938/pexels-photo-34334938.jpeg',
+      'https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg',
+    ],
+  },
+  'pkg-golden-temple-amritsar': {
+    heroImage: 'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg',
+      'https://images.pexels.com/photos/3581369/pexels-photo-3581369.jpeg',
+      'https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg',
+      'https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg',
+    ],
+  },
+  'pkg-gulmarg-snow': {
+    heroImage: 'https://images.pexels.com/photos/1271619/pexels-photo-1271619.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/1271619/pexels-photo-1271619.jpeg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+      'https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg',
+      'https://cdn.pixabay.com/photo/2016/11/23/15/48/audience-1853662_1280.jpg',
+    ],
+  },
+  'pkg-delhi-heritage': {
+    heroImage: 'https://images.pexels.com/photos/34334938/pexels-photo-34334938.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/34334938/pexels-photo-34334938.jpeg',
+      'https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg',
+      'https://images.pexels.com/photos/2404368/pexels-photo-2404368.jpeg',
+      'https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg',
+    ],
+  },
+  'pkg-chandigarh-himachal': {
+    heroImage: 'https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg',
+      'https://images.pexels.com/photos/1271619/pexels-photo-1271619.jpeg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+      'https://cdn.pixabay.com/photo/2019/11/05/13/43/shimla-4603952_1280.jpg',
+    ],
+  },
+  'pkg-taj-mahal-sunrise': {
+    heroImage: 'https://images.pexels.com/photos/147411/pexels-photo-147411.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/147411/pexels-photo-147411.jpeg',
+      'https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg',
+      'https://images.pexels.com/photos/2404368/pexels-photo-2404368.jpeg',
+      'https://images.pexels.com/photos/34334938/pexels-photo-34334938.jpeg',
+    ],
+  },
+  'pkg-wagah-border': {
+    heroImage: 'https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg',
+      'https://images.pexels.com/photos/3581368/pexels-photo-3581368.jpeg',
+      'https://images.pexels.com/photos/1603650/pexels-photo-1603650.jpeg',
+      'https://images.pexels.com/photos/789750/pexels-photo-789750.jpeg',
+    ],
+  },
+  'pkg-bangalore-city': {
+    heroImage: 'https://images.pexels.com/photos/1796715/pexels-photo-1796715.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/1796715/pexels-photo-1796715.jpeg',
+      'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg',
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+    ],
+  },
+  'pkg-bangalore-coorg': {
+    heroImage: 'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+      'https://images.pexels.com/photos/1796715/pexels-photo-1796715.jpeg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+      'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg',
+    ],
+  },
+  'pkg-coorg-nature-retreat': {
+    heroImage: 'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+      'https://images.pexels.com/photos/1796715/pexels-photo-1796715.jpeg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+      'https://cdn.pixabay.com/photo/2017/08/06/17/38/coffee-2596481_1280.jpg',
+    ],
+  },
+  'pkg-coorg-waterfalls': {
+    heroImage: 'https://cdn.pixabay.com/photo/2017/08/06/17/38/coffee-2596481_1280.jpg',
+    gallery: [
+      'https://cdn.pixabay.com/photo/2017/08/06/17/38/coffee-2596481_1280.jpg',
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+      'https://images.pexels.com/photos/1796715/pexels-photo-1796715.jpeg',
+    ],
+  },
+  'pkg-chennai-temple-trail': {
+    heroImage: 'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg',
+      'https://images.pexels.com/photos/1796715/pexels-photo-1796715.jpeg',
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+    ],
+  },
+  'pkg-araku-coffee-trails': {
+    heroImage: 'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+      'https://cdn.pixabay.com/photo/2017/08/06/17/38/coffee-2596481_1280.jpg',
+      'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+    ],
+  },
+  'pkg-kerala-lovers-paradise': {
+    heroImage: 'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+      'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg',
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+      'https://cdn.pixabay.com/photo/2016/11/14/04/45/beach-1822598_1280.jpg',
+    ],
+  },
+  'pkg-marvelous-kerala': {
+    heroImage: 'https://cdn.pixabay.com/photo/2016/11/14/04/45/beach-1822598_1280.jpg',
+    gallery: [
+      'https://cdn.pixabay.com/photo/2016/11/14/04/45/beach-1822598_1280.jpg',
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+      'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg',
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+    ],
+  },
+  'pkg-mesmerizing-backwaters': {
+    heroImage: 'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+    gallery: [
+      'https://images.pexels.com/photos/18821817/pexels-photo-18821817.jpeg',
+      'https://cdn.pixabay.com/photo/2016/11/14/04/45/beach-1822598_1280.jpg',
+      'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg',
+      'https://images.pexels.com/photos/33574682/pexels-photo-33574682.jpeg',
+    ],
+  },
+};
+
 const buildPackage = (item) => ({
   ...packageBase,
+  ...(packageImages[item.slug] ?? {}),
   tourType: 'Leisure Tour',
   groupSize: 'Custom',
   languages: 'English, Hindi',

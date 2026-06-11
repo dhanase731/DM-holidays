@@ -38,6 +38,21 @@ const bookingSchema = new mongoose.Schema({
   status:      { type: String, enum: ['new', 'contacted', 'closed'], default: 'new' },
 }, { timestamps: true });
 
-export const Enquiry = mongoose.model('Enquiry', enquirySchema);
-export const Contact = mongoose.model('Contact', contactSchema);
-export const Booking = mongoose.model('Booking', bookingSchema);
+const visitorSchema = new mongoose.Schema({
+  name:      { type: String, trim: true, default: 'Guest' },
+  email:     { type: String, trim: true, default: '' },
+  page:      { type: String, trim: true, default: '/' },
+  userAgent: { type: String, trim: true, default: '' },
+  ip:        { type: String, trim: true, default: '' },
+}, { timestamps: true });
+
+const siteSettingsSchema = new mongoose.Schema({
+  key:   { type: String, unique: true, trim: true },
+  value: { type: mongoose.Schema.Types.Mixed },
+}, { timestamps: true });
+
+export const Enquiry      = mongoose.model('Enquiry', enquirySchema);
+export const Contact      = mongoose.model('Contact', contactSchema);
+export const Booking      = mongoose.model('Booking', bookingSchema);
+export const Visitor      = mongoose.model('Visitor', visitorSchema);
+export const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);

@@ -14,7 +14,8 @@ import {
 } from './siteData';
 import { assets } from './assets';
 import { HeroCarousel, PackageGallery, SiteFooter, SiteNavbar, useBodyClass } from './components';
-import { submitEnquiry, submitContact as apiSubmitContact, submitBooking } from './api';
+import { submitEnquiry, submitContact as apiSubmitContact, submitBooking, trackVisitor } from './api';
+import { getStoredUser, isLoggedIn } from './auth';
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
@@ -190,16 +191,7 @@ export function HomePage() {
             activeIndex={activeSlide}
             onChange={setActiveSlide}
           />
-          <div className="container py-4 text-center">
-            <div className="d-flex gap-3 justify-content-center flex-wrap">
-              <button className="btn btn-warning fw-semibold" type="button" onClick={() => goHash('south')}>
-                South India slide
-              </button>
-              <button className="btn btn-outline-dark fw-semibold" type="button" onClick={() => goHash('north')}>
-                North India slide
-              </button>
-            </div>
-          </div>
+
         </section>
 
         <section className="container py-5">
@@ -1215,12 +1207,62 @@ export function EnquiryPage() {
   );
 }
 
+function ForgotPasswordModal({ onClose }) {
+  const [email, setEmail] = useState('');
+  const [msg, setMsg] = useState('');
+  const [isError, setIsError] = useState(false);
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (!emailRegex.test(email)) { setIsError(true); setMsg('Enter a valid email address.'); return; }
+    const stored = localStorage.getItem('dmh_user') || sessionStorage.getItem('dmh_user');
+    if (!stored) { setIsError(true); setMsg('No account found with this email.'); return; }
+    const user = JSON.parse(stored);
+    if (user.email.toLowerCase() !== email.toLowerCase()) { setIsError(true); setMsg('No account found with this email.'); return; }
+    setIsError(false);
+    setMsg(`Your password is: ${user.password}`);
+  };
+
+  return (
+    <div className="forgot-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="forgot-modal-card">
+        <button className="forgot-modal-close" onClick={onClose} aria-label="Close">✕</button>
+        <h3 className="forgot-modal-title">Forgot Password</h3>
+        <p className="forgot-modal-sub">Enter your registered email and we'll show your password.</p>
+        <form onSubmit={submit} noValidate>
+          <input
+            className="form-control auth-input mb-3"
+            type="email"
+            placeholder="you@dmholidays.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            autoFocus
+          />
+          <button type="submit" className="btn auth-btn auth-btn-primary w-100">Retrieve Password</button>
+        </form>
+        {msg && (
+          <div className={`forgot-modal-msg mt-3 ${isError ? 'forgot-modal-error' : 'forgot-modal-success'}`}>
+            {msg}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function LoginPage() {
   useBodyClass('auth-page');
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ email: '', password: '', remember: true });
   const [errors, setErrors] = useState({});
   const [message, setMessage] = useState('');
+  const [showForgot, setShowForgot] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedIn()) navigate(location.state?.from?.pathname ?? '/', { replace: true });
+  }, []);
 
   const submit = (event) => {
     event.preventDefault();
@@ -1233,10 +1275,7 @@ export function LoginPage() {
     if (Object.keys(nextErrors).length) return;
 
     const stored = localStorage.getItem('dmh_user') || sessionStorage.getItem('dmh_user');
-    if (!stored) {
-      setMessage('No account found. Please sign up first.');
-      return;
-    }
+    if (!stored) { setMessage('No account found. Please sign up first.'); return; }
 
     const user = JSON.parse(stored);
     if (user.email !== form.email || user.password !== form.password) {
@@ -1244,63 +1283,68 @@ export function LoginPage() {
       return;
     }
 
-    const payload = JSON.stringify(user);
     localStorage.setItem('dmh_logged_in', 'true');
     sessionStorage.setItem('dmh_logged_in', 'true');
-    if (form.remember) localStorage.setItem('dmh_user', payload);
-    else sessionStorage.setItem('dmh_user', payload);
-    setMessage('Login successful! Welcome back.');
-    navigate('/');
+    if (form.remember) localStorage.setItem('dmh_user', JSON.stringify(user));
+    else sessionStorage.setItem('dmh_user', JSON.stringify(user));
+
+    // Track visitor login
+    trackVisitor({ name: user.name, email: user.email, page: '/login' });
+
+    navigate(location.state?.from?.pathname ?? '/');
   };
 
   return (
-    <AuthShell
-      kicker="Member Access"
-      title="Sign in to plan your next getaway"
-      subtitle="Manage bookings, save favorites, and unlock curated itineraries built by our travel experts."
-      stats={[
-        { value: '50K+', label: 'Happy travelers' },
-        { value: '24/7', label: 'Trip support' },
-      ]}
-      actionLabel="Create account"
-      actionHref="/signup"
-      actionText="Need a new account?"
-      rightTitle="Luxury trips made effortless."
-      rightText="Browse handpicked stays, premium tours, and custom routes curated for your travel style."
-      highlight="Trusted by 50,000+ happy explorers."
-      chips={['Verified guides', 'Best price', 'Instant support']}
-    >
-      <form className="auth-form" onSubmit={submit} noValidate>
-        <label className="form-label" htmlFor="loginEmail">Email Address</label>
-        <input className="form-control auth-input" type="email" id="loginEmail" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@dmholidays.com" autoComplete="email" />
-        <small className="auth-error">{errors.email ?? ''}</small>
+    <>
+      {showForgot && <ForgotPasswordModal onClose={() => setShowForgot(false)} />}
+      <AuthShell
+        kicker="Member Access"
+        title="Sign in to plan your next getaway"
+        subtitle="Manage bookings, save favorites, and unlock curated itineraries built by our travel experts."
+        stats={[
+          { value: '50K+', label: 'Happy travelers' },
+          { value: '24/7', label: 'Trip support' },
+        ]}
+        actionLabel="Create account"
+        actionHref="/signup"
+        actionText="Need a new account?"
+        rightTitle="Luxury trips made effortless."
+        rightText="Browse handpicked stays, premium tours, and custom routes curated for your travel style."
+        highlight="Trusted by 50,000+ happy explorers."
+        chips={['Verified guides', 'Best price', 'Instant support']}
+      >
+        <form className="auth-form" onSubmit={submit} noValidate>
+          <label className="form-label" htmlFor="loginEmail">Email Address</label>
+          <input className="form-control auth-input" type="email" id="loginEmail" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@dmholidays.com" autoComplete="email" />
+          <small className="auth-error">{errors.email ?? ''}</small>
 
-        <label className="form-label mt-3" htmlFor="loginPassword">Password</label>
-        <input className="form-control auth-input" type="password" id="loginPassword" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Minimum 8 characters" autoComplete="current-password" />
-        <small className="auth-error">{errors.password ?? ''}</small>
+          <label className="form-label mt-3" htmlFor="loginPassword">Password</label>
+          <input className="form-control auth-input" type="password" id="loginPassword" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder="Minimum 8 characters" autoComplete="current-password" />
+          <small className="auth-error">{errors.password ?? ''}</small>
 
-        <div className="d-flex align-items-center justify-content-between auth-meta">
-          <label className="form-check">
-            <input className="form-check-input" type="checkbox" checked={form.remember} onChange={(e) => setForm({ ...form, remember: e.target.checked })} />
-            <span className="form-check-label">Remember me</span>
-          </label>
-          <a className="auth-link" href="#">Forgot password?</a>
-        </div>
+          <div className="d-flex align-items-center justify-content-between auth-meta">
+            <label className="form-check">
+              <input className="form-check-input" type="checkbox" checked={form.remember} onChange={(e) => setForm({ ...form, remember: e.target.checked })} />
+              <span className="form-check-label">Remember me</span>
+            </label>
+            <button type="button" className="btn btn-link auth-link p-0 fw-bold" onClick={() => setShowForgot(true)}>Forgot password?</button>
+          </div>
 
-        <div className="d-flex flex-wrap gap-3 mt-4">
-          <button type="submit" className="btn auth-btn auth-btn-primary">Login</button>
-          <Link className="btn auth-btn auth-btn-outline" to="/signup">Create account</Link>
-        </div>
+          <div className="d-flex flex-wrap gap-3 mt-4">
+            <button type="submit" className="btn auth-btn auth-btn-primary">Login</button>
+            <Link className="btn auth-btn auth-btn-outline" to="/signup">Create account</Link>
+          </div>
 
-        <div className={`auth-message ${message ? 'auth-success' : ''}`}>{message}</div>
-        <div className="auth-divider">Or continue with</div>
-        <div className="auth-social">
-          <a className="auth-link" href="#">Facebook</a>
-          <a className="auth-link" href="#">LinkedIn</a>
-          <a className="auth-link" href="#">Google</a>
-        </div>
-      </form>
-    </AuthShell>
+          <div className={`auth-message ${message ? (message.includes('successful') ? 'auth-success' : 'auth-error d-block') : ''}`}>{message}</div>
+          <div className="auth-divider">Or continue with</div>
+          <div className="auth-social">
+            <a className="auth-link" href="#">Facebook</a>
+            <a className="auth-link" href="#">LinkedIn</a>
+            <a className="auth-link" href="#">Google</a>
+          </div>
+        </form>
+      </AuthShell>
+    </>
   );
 }
 
@@ -1377,7 +1421,7 @@ export function SignupPage() {
         <small className="auth-error">{errors.confirm ?? ''}</small>
 
         <div className="auth-meta">
-          By continuing, you agree to our <a className="auth-link" href="#">Terms</a> and <a className="auth-link" href="#">Privacy Policy</a>.
+          By continuing, you agree to our <Link className="auth-link" to="/terms">Terms</Link> and <Link className="auth-link" to="/privacy">Privacy Policy</Link>.
         </div>
 
         <div className="d-flex flex-wrap gap-3 mt-4">
@@ -1385,7 +1429,7 @@ export function SignupPage() {
           <Link className="btn auth-btn auth-btn-outline" to="/login">I already have an account</Link>
         </div>
 
-        <div className={`auth-message ${message ? 'auth-success' : ''}`}>{message}</div>
+        <div className={`auth-message ${message ? (message.includes('created') ? 'auth-success' : 'auth-error d-block') : ''}`}>{message}</div>
         <div className="auth-divider">Or sign up with</div>
         <div className="auth-social">
           <a className="auth-link" href="#">Facebook</a>
@@ -1394,5 +1438,140 @@ export function SignupPage() {
         </div>
       </form>
     </AuthShell>
+  );
+}
+
+function LegalShell({ title, updated, children }) {
+  return (
+    <>
+      <SiteNavbar />
+      <main>
+        <section className="legal-hero">
+          <div className="container">
+            <nav aria-label="breadcrumb" className="mb-3">
+              <ol className="breadcrumb">
+                <li className="breadcrumb-item"><Link to="/">Home</Link></li>
+                <li className="breadcrumb-item active" aria-current="page">{title}</li>
+              </ol>
+            </nav>
+            <h1 className="legal-title">{title}</h1>
+            <p className="legal-updated">Last updated: {updated}</p>
+          </div>
+        </section>
+        <section className="container py-5">
+          <div className="row justify-content-center">
+            <div className="col-12 col-lg-9 legal-body">{children}</div>
+          </div>
+        </section>
+      </main>
+      <SiteFooter />
+    </>
+  );
+}
+
+export function TermsPage() {
+  return (
+    <LegalShell title="Terms & Conditions" updated="January 1, 2025">
+      <h2>1. Acceptance of Terms</h2>
+      <p>By accessing or using the DM Holidays website (dmholidays.in) or any services provided by DM Holidays Private Limited ("DM Holidays", "we", "us"), you agree to be bound by these Terms and Conditions. If you do not agree, please do not use our services.</p>
+
+      <h2>2. Services</h2>
+      <p>DM Holidays provides travel planning, tour packages, holiday bookings, and related services for destinations across India and internationally. All services are subject to availability and may change without prior notice.</p>
+
+      <h2>3. Booking & Payment</h2>
+      <p>All bookings are subject to availability and confirmation by DM Holidays. A booking is confirmed only upon receipt of the required deposit or full payment as specified in the booking confirmation. Prices are quoted in Indian Rupees (INR) and are subject to change until a booking is confirmed.</p>
+
+      <h2>4. Cancellation & Refund Policy</h2>
+      <p>Cancellations must be made in writing to our customer support team. Refunds are processed as follows:</p>
+      <ul>
+        <li>Cancellation 30+ days before travel: 90% refund</li>
+        <li>Cancellation 15–29 days before travel: 50% refund</li>
+        <li>Cancellation 7–14 days before travel: 25% refund</li>
+        <li>Cancellation less than 7 days before travel: No refund</li>
+      </ul>
+      <p>Refunds are processed within 7–14 business days to the original payment method.</p>
+
+      <h2>5. Travel Documents</h2>
+      <p>It is the traveler's responsibility to ensure all required travel documents (passport, visa, permits) are valid and current. DM Holidays is not responsible for any loss or inconvenience arising from inadequate travel documentation.</p>
+
+      <h2>6. Liability</h2>
+      <p>DM Holidays acts as an agent for hotels, airlines, transport providers, and other service providers. We are not liable for any personal injury, loss of property, or inconvenience resulting from the services of third-party providers. Our liability is limited to the value of the services booked through us.</p>
+
+      <h2>7. Force Majeure</h2>
+      <p>DM Holidays shall not be liable for any delay, cancellation, or failure due to circumstances beyond our reasonable control, including natural disasters, strikes, political unrest, pandemics, or government actions.</p>
+
+      <h2>8. Intellectual Property</h2>
+      <p>All content on this website—including text, images, logos, and designs—is the property of DM Holidays Private Limited and may not be reproduced without written permission.</p>
+
+      <h2>9. Governing Law</h2>
+      <p>These Terms are governed by the laws of India. Any disputes shall be subject to the exclusive jurisdiction of courts in Chennai, Tamil Nadu.</p>
+
+      <h2>10. Contact</h2>
+      <p>For any questions regarding these Terms, please contact us at <strong>mail@dmholidays.in</strong> or call <strong>+91 9790831205</strong>.</p>
+    </LegalShell>
+  );
+}
+
+export function PrivacyPage() {
+  return (
+    <LegalShell title="Privacy Policy" updated="January 1, 2025">
+      <h2>1. Introduction</h2>
+      <p>DM Holidays Private Limited ("we", "our", "us") is committed to protecting your personal information. This Privacy Policy explains how we collect, use, and safeguard your data when you use our website or services.</p>
+
+      <h2>2. Information We Collect</h2>
+      <p>We collect the following types of personal information:</p>
+      <ul>
+        <li><strong>Identity Data:</strong> Name, date of birth, passport/ID details</li>
+        <li><strong>Contact Data:</strong> Email address, phone number, mailing address</li>
+        <li><strong>Transaction Data:</strong> Booking details, payment records</li>
+        <li><strong>Technical Data:</strong> IP address, browser type, device information</li>
+        <li><strong>Usage Data:</strong> Pages visited, time spent, links clicked</li>
+      </ul>
+
+      <h2>3. How We Use Your Information</h2>
+      <p>We use your personal data to:</p>
+      <ul>
+        <li>Process and manage travel bookings</li>
+        <li>Communicate booking confirmations and travel updates</li>
+        <li>Provide customer support</li>
+        <li>Send marketing communications (with your consent)</li>
+        <li>Improve our website and services</li>
+        <li>Comply with legal and regulatory obligations</li>
+      </ul>
+
+      <h2>4. Data Sharing</h2>
+      <p>We do not sell your personal information. We may share your data with:</p>
+      <ul>
+        <li>Hotels, airlines, and transport providers to fulfill your booking</li>
+        <li>Payment processors for secure transactions</li>
+        <li>Government/regulatory authorities when required by law</li>
+      </ul>
+
+      <h2>5. Cookies</h2>
+      <p>Our website uses cookies to enhance your browsing experience and analyze site traffic. You can control cookie settings through your browser. Disabling cookies may affect some website functionality.</p>
+
+      <h2>6. Data Security</h2>
+      <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, alteration, disclosure, or destruction. However, no internet transmission is 100% secure.</p>
+
+      <h2>7. Data Retention</h2>
+      <p>We retain your personal data for as long as necessary to fulfill the purposes outlined in this policy, or as required by law. Booking records are typically retained for 7 years for accounting and legal purposes.</p>
+
+      <h2>8. Your Rights</h2>
+      <p>You have the right to:</p>
+      <ul>
+        <li>Access the personal data we hold about you</li>
+        <li>Request correction of inaccurate data</li>
+        <li>Request deletion of your data (subject to legal obligations)</li>
+        <li>Withdraw consent for marketing communications</li>
+        <li>Lodge a complaint with the relevant data protection authority</li>
+      </ul>
+
+      <h2>9. Third-Party Links</h2>
+      <p>Our website may contain links to third-party sites. We are not responsible for the privacy practices of those websites and encourage you to review their privacy policies.</p>
+
+      <h2>10. Contact</h2>
+      <p>For any privacy-related questions or requests, contact our Data Protection Officer at <strong>mail@dmholidays.in</strong> or write to:</p>
+      <p>DM Holidays Pvt LTD, No.1, Gemini Parsn, Kodambakkam High Road, Nungambakkam, Chennai – 600006, Tamil Nadu, India.</p>
+    </LegalShell>
   );
 }

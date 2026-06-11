@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import {
   AboutPage,
   BlogPage,
@@ -14,38 +14,59 @@ import {
   PackagePage,
   SouthIndiaPage,
   SignupPage,
+  TermsPage,
+  PrivacyPage,
 } from './pages';
 import { AdminPage } from './AdminPage';
 import { destinationDetails, packageDetails } from './siteData';
+import { isLoggedIn } from './auth';
 
 const destinationRoutes = Object.keys(destinationDetails);
 const packageRoutes = Object.keys(packageDetails);
 
+function ProtectedRoute({ children }) {
+  const location = useLocation();
+  if (!isLoggedIn()) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return children;
+}
+
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/faqs" element={<FaqsPage />} />
-      <Route path="/blog" element={<BlogPage />} />
-      <Route path="/blog/:slug" element={<BlogPostPage />} />
-      <Route path="/blog-post.html" element={<BlogPostPage />} />
-      <Route path="/booking" element={<BookingPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/north-india" element={<NorthIndiaPage />} />
-      <Route path="/south-india" element={<SouthIndiaPage />} />
-      <Route path="/enquiry" element={<EnquiryPage />} />
-      <Route path="/admin" element={<AdminPage />} />
+      {/* Auth pages — always accessible */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
+      {/* Static legal pages */}
+      <Route path="/terms" element={<TermsPage />} />
+      <Route path="/privacy" element={<PrivacyPage />} />
+
+      {/* Admin — its own auth */}
+      <Route path="/admin" element={<AdminPage />} />
+
+      {/* Protected routes */}
+      <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
+      <Route path="/about" element={<ProtectedRoute><AboutPage /></ProtectedRoute>} />
+      <Route path="/faqs" element={<ProtectedRoute><FaqsPage /></ProtectedRoute>} />
+      <Route path="/blog" element={<ProtectedRoute><BlogPage /></ProtectedRoute>} />
+      <Route path="/blog/:slug" element={<ProtectedRoute><BlogPostPage /></ProtectedRoute>} />
+      <Route path="/blog-post.html" element={<ProtectedRoute><BlogPostPage /></ProtectedRoute>} />
+      <Route path="/booking" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
+      <Route path="/contact" element={<ProtectedRoute><ContactPage /></ProtectedRoute>} />
+      <Route path="/north-india" element={<ProtectedRoute><NorthIndiaPage /></ProtectedRoute>} />
+      <Route path="/south-india" element={<ProtectedRoute><SouthIndiaPage /></ProtectedRoute>} />
+      <Route path="/enquiry" element={<ProtectedRoute><EnquiryPage /></ProtectedRoute>} />
+
       {destinationRoutes.map((slug) => (
-        <Route key={slug} path={`/destinations/${slug}`} element={<DestinationPage />} />
+        <Route key={slug} path={`/destinations/${slug}`} element={<ProtectedRoute><DestinationPage /></ProtectedRoute>} />
       ))}
       {packageRoutes.map((slug) => (
-        <Route key={slug} path={`/packages/${slug}`} element={<PackagePage />} />
+        <Route key={slug} path={`/packages/${slug}`} element={<ProtectedRoute><PackagePage /></ProtectedRoute>} />
       ))}
 
+      {/* HTML redirects */}
       <Route path="/About.html" element={<Navigate to="/about" replace />} />
       <Route path="/faqs.html" element={<Navigate to="/faqs" replace />} />
       <Route path="/blog.html" element={<Navigate to="/blog" replace />} />

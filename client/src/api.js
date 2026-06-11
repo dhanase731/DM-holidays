@@ -34,30 +34,22 @@ async function del(endpoint) {
   return res.json();
 }
 
-export async function submitEnquiry(data) {
-  return post('enquiry', data);
+export async function submitEnquiry(data) { return post('enquiry', data); }
+export async function submitContact(data) { return post('contact', data); }
+export async function submitBooking(data) { return post('booking', data); }
+
+export async function trackVisitor(data) {
+  try { return await post('visitor', data); } catch { /* silent */ }
 }
 
-export async function submitContact(data) {
-  return post('contact', data);
-}
+export async function getPublicSettings() { return get('settings'); }
 
-export async function submitBooking(data) {
-  return post('booking', data);
-}
-
-export async function adminLogin(password) {
-  return post('admin/login', { password });
-}
-
-export async function adminGetData(password) {
-  return get(`admin/data?password=${encodeURIComponent(password)}`);
-}
-
+export async function adminLogin(password) { return post('admin/login', { password }); }
+export async function adminGetData(password) { return get(`admin/data?password=${encodeURIComponent(password)}`); }
 export async function adminUpdateStatus(collection, id, status, password) {
   return patch(`admin/${collection}/${id}`, { status, password });
 }
-
 export async function adminDeleteRecord(collection, id, password) {
   return del(`admin/${collection}/${id}?password=${encodeURIComponent(password)}`);
 }
+export async function adminSaveSettings(data) { return post('admin/settings', data); }
